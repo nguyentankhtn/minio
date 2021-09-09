@@ -3615,8 +3615,10 @@ func (api objectAPIHandlers) CompleteMultipartUploadHandler(w http.ResponseWrite
 
 	// Complete parts.
 	completeParts := make([]CompletePart, 0, len(complMultipartUpload.Parts))
+	originalCompleteParts := make([]CompletePart, 0, len(complMultipartUpload.Parts))
 	for _, part := range complMultipartUpload.Parts {
 		part.ETag = canonicalizeETag(part.ETag)
+		originalCompleteParts = append(originalCompleteParts, part)
 		if isEncrypted {
 			// ETag is stored in the backend in encrypted form. Validate client sent ETag with
 			// decrypted ETag.
@@ -3631,6 +3633,9 @@ func (api objectAPIHandlers) CompleteMultipartUploadHandler(w http.ResponseWrite
 		}
 		completeParts = append(completeParts, part)
 	}
+
+	// Calculate s3 compatible md5sum for complete multipart.
+	s3MD5 := getCompleteMultipartMD5(originalCompleteParts)
 
 	completeMultiPartUpload := objectAPI.CompleteMultipartUpload
 
@@ -3671,6 +3676,11 @@ func (api objectAPIHandlers) CompleteMultipartUploadHandler(w http.ResponseWrite
 	if err != nil {
 		writeErrorResponse(ctx, w, toAPIError(ctx, err), r.URL)
 		return
+	}
+
+	// preserve ETag if set, or set from parts.
+	if _, ok := opts.UserDefined["etag"]; !ok {
+		opts.UserDefined["etag"] = s3MD5
 	}
 
 	w = &whiteSpaceWriter{ResponseWriter: w, Flusher: w.(http.Flusher)}
