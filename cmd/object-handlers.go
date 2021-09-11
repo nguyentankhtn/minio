@@ -3157,7 +3157,6 @@ func (api objectAPIHandlers) CompleteMultipartUploadHandler(w http.ResponseWrite
 // DeleteObjectHandler - delete an object
 func (api objectAPIHandlers) DeleteObjectHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := newContext(r, w, "DeleteObject")
-	fmt.Println("====DeleteObjectHandler")
 
 	defer logger.AuditLog(w, r, "DeleteObject", mustGetClaimsFromToken(r))
 
