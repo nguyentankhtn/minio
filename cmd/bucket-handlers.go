@@ -349,8 +349,6 @@ func (api objectAPIHandlers) ListBucketsHandler(w http.ResponseWriter, r *http.R
 func (api objectAPIHandlers) DeleteMultipleObjectsHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := newContext(r, w, "DeleteMultipleObjects")
 
-	fmt.Println("===DeleteMultipleObjectsHandler")
-
 	defer logger.AuditLog(w, r, "DeleteMultipleObjects", mustGetClaimsFromToken(r))
 
 	vars := mux.Vars(r)
