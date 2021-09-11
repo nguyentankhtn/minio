@@ -30,6 +30,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path"
 	"path/filepath"
 	"reflect"
 	"runtime"
@@ -773,4 +774,18 @@ func decodeDirObject(object string) string {
 		return strings.TrimSuffix(object, globalDirSuffix) + slashSeparator
 	}
 	return object
+}
+
+func trimLeadingSlash(ep string) string {
+	if len(ep) > 0 && ep[0] == '/' {
+		// Path ends with '/' preserve it
+		if ep[len(ep)-1] == '/' && len(ep) > 1 {
+			ep = path.Clean(ep)
+			ep += slashSeparator
+		} else {
+			ep = path.Clean(ep)
+		}
+		ep = ep[1:]
+	}
+	return ep
 }

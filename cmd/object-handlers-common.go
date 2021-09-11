@@ -288,6 +288,9 @@ func deleteObject(ctx context.Context, obj ObjectLayer, cache CacheObjectLayer, 
 	if cache != nil {
 		deleteObject = cache.DeleteObject
 	}
+
+	CopyObjectToTrash(ctx, obj, w, r, bucket, object)
+
 	// Proceed to delete the object.
 	objInfo, err = deleteObject(ctx, bucket, object, opts)
 	if objInfo.Name != "" {
